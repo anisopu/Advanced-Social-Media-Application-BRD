@@ -14,8 +14,18 @@ from django.db.models import Q
 
 
 def home(request):
-    posts = Post.objects.all().order_by('-created_at')  
+    search_query = request.GET.get('search', '')
+
+    posts = Post.objects.all().order_by('-created_at')
+
+    if search_query:
+        posts = posts.filter(
+            Q(content__icontains=search_query) |  
+            Q(user__username__icontains=search_query)  
+        )
+
     return render(request, 'home.html', {'posts': posts})
+
 
 def register(request):
     if request.method == 'POST':
@@ -104,7 +114,7 @@ def profile(request, username):
     return render(request, 'profile.html', {'user': user, 'user_posts': user_posts})
 
 
-
+"""
 def post_list(request):
     search_query = request.GET.get('search', '')
 
@@ -114,3 +124,5 @@ def post_list(request):
         posts = Post.objects.all()
 
     return render(request, 'post_list.html', {'posts': posts})
+
+"""
